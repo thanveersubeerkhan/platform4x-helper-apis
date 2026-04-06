@@ -19,11 +19,15 @@
   "license": "MIT",
   "dependencies": {
     "@hono/node-server": "^1.13.8",
+    "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.4.7",
     "hono": "^4.7.2",
+    "html-to-text": "^9.0.5",
     "postgres": "^3.4.5"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.35",
+    "@types/html-to-text": "^9.0.4",
     "@types/node": "^22.13.10",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2"

@@ -1,6 +1,10 @@
+import 'dotenv/config'
 import { serve } from '@hono/node-server'
 import { Context, Hono } from 'hono'
 import { sql, ensureTableExists } from './db.js'
+import cleanEmail from './email_cleaner/index.js'
+
+import { hasArabic } from './text_utils.js'
 
 // --- 🔹 Schema Definitions ---
 export interface SuccessResponse {
@@ -300,10 +304,52 @@ app.get('/subscription/renew/:id', async (c: Context) => {
 })
 
 /**
+ * 🔹 POST /email/clean
+ * Raw email HTML cleaning
+ */
+app.post('/email/clean', async (c: Context) => {
+  try {
+    const { htmlBody, config } = await c.req.json()
+    if (!htmlBody) {
+      return c.json({ error: 'Missing htmlBody' }, 400)
+    }
+
+    const cleaned = cleanEmail(htmlBody, config)
+    return c.json(cleaned)
+
+  } catch (err) {
+    console.error('Email clean error:', err)
+    return c.json({ error: 'Failed to clean email' }, 500)
+  }
+})
+
+/**
+ * 🔹 GET /email/fetch-latest
+ * Fetch latest emails and clean them
+ */
+
+
+/**
+ * 🔹 POST /text/has-arabic
+ * Check if the given text contains Arabic characters
+ */
+app.post('/text/has-arabic', async (c: Context) => {
+  try {
+    const { text } = await c.req.json()
+    return c.json({
+      has_arabic: hasArabic(text)
+    })
+  } catch (err) {
+    console.error('Arabic check error:', err)
+    return c.json({ error: 'Failed to process Arabic check' }, 500)
+  }
+})
+
+/**
  * 🔹 Health check
  */
 app.get('/', (c: Context) => {
-  return c.text('Token Service Running')
+  return c.text('Token & Email Service Running')
 })
 
 const port = 3000
