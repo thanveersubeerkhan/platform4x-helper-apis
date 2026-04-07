@@ -42,7 +42,7 @@ async function triggerHook(flowId: string, label: string) {
  */
 export const renewSubscriptionTask = schedules.task({
   id: "renew-subscription-1775129566877",
-  cron: "*/70 * * * *",
+  cron: "*/30 * * * *",
   run: async () => {
     await triggerHook("1775129566877", "Renew Subscription");
   }
