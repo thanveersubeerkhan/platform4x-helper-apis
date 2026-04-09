@@ -346,6 +346,55 @@ app.post('/text/has-arabic', async (c: Context) => {
 })
 
 /**
+ * 🔹 POST /message-ids
+ * Store a message id. Ignores duplicates.
+ */
+app.post('/message-ids', async (c: Context) => {
+  try {
+    const { message_id } = await c.req.json()
+
+    if (!message_id) {
+      return c.json({ error: 'Missing message_id' }, 400)
+    }
+
+    await sql`
+      INSERT INTO message_ids (message_id)
+      VALUES (${message_id})
+      ON CONFLICT (message_id) DO NOTHING
+    `
+
+    return c.json({ success: true } as SuccessResponse)
+  } catch (err) {
+    console.error('Message ID save error:', err)
+    return c.json({ error: 'Failed to save message ID' } as ErrorResponse, 500)
+  }
+})
+
+/**
+ * 🔹 GET /message-ids/:id
+ * Return true/false if message id is present
+ */
+app.get('/message-ids/:id', async (c: Context) => {
+  try {
+    const messageId = c.req.param('id') as string
+
+    if (!messageId) {
+      return c.json({ error: 'Missing message ID' } as ErrorResponse, 400)
+    }
+    
+    // Check if exists
+    const result = await sql`
+      SELECT 1 FROM message_ids WHERE message_id = ${messageId}
+    `
+
+    return c.json({ exists: result.length > 0 })
+  } catch (err) {
+    console.error('Message ID check error:', err)
+    return c.json({ error: 'Failed to check message ID' } as ErrorResponse, 500)
+  }
+})
+
+/**
  * 🔹 Health check
  */
 app.get('/', (c: Context) => {

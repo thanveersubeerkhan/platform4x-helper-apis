@@ -40,4 +40,12 @@ export const ensureTableExists = async () => {
     ALTER TABLE graph_subscription_store 
     ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW()
   `
+
+  // 🔹 Create message_ids
+  await sql`
+    CREATE TABLE IF NOT EXISTS message_ids (
+      message_id TEXT PRIMARY KEY,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `
 }
